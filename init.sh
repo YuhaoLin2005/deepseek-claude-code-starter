@@ -3,9 +3,9 @@
 # init.sh — DeepSeek Claude Code 脚手架 一键初始化
 # ============================================================
 # 用法:
-#   curl -sL https://raw.githubusercontent.com/YuhaoLin2005/claude-code-starter/main/init.sh | bash
+#   curl -sL https://raw.githubusercontent.com/YuhaoLin2005/deepseek-claude-code-starter/main/init.sh | bash
 #   或
-#   git clone && cd claude-code-starter && ./init.sh
+#   git clone && cd deepseek-claude-code-starter && ./init.sh
 # ============================================================
 set -e
 
@@ -27,9 +27,9 @@ if [ -f "$SCRIPT_DIR/.claude/settings.json" ]; then
     info "检测到本地仓库: $REPO_DIR"
 else
     # curl pipe 模式: 克隆到临时目录
-    REPO_DIR="/tmp/claude-code-starter-$$"
+    REPO_DIR="/tmp/deepseek-claude-code-starter-$$"
     info "克隆仓库到: $REPO_DIR"
-    git clone --depth 1 https://github.com/YuhaoLin2005/claude-code-starter.git "$REPO_DIR" 2>/dev/null || {
+    git clone --depth 1 https://github.com/YuhaoLin2005/deepseek-claude-code-starter.git "$REPO_DIR" 2>/dev/null || {
         fail "克隆失败，请检查网络连接"
         exit 1
     }
