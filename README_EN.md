@@ -1,6 +1,6 @@
 # Claude Code + DeepSeek: The Missing Config Layer
 
-> **A project scaffolding toolkit built specifically for Claude Code CLI + DeepSeek API users.** Clone → Copy → Edit 2 paths → Work. Every feature is a solved pain point.
+> **A project scaffolding toolkit built specifically for Claude Code CLI + DeepSeek API users.** Clone → init.sh → Work. Every feature solves a pain point we actually hit.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![Platform: Windows](https://img.shields.io/badge/Platform-Windows-blue.svg)](#)
@@ -73,7 +73,7 @@
 
 ---
 
-## Four Problems This Solves
+## Five Problems This Solves
 
 ### ① DeepSeek Cache Hit Rate Stuck at ~50%
 
@@ -91,7 +91,7 @@ Tokens saved: 21.3K (54.4%)
 
 Fresh `npm install -g @anthropic-ai/claude-code` gives you a bare CLI. No MCP services. No custom agents. No rules. Everyone wastes the same days reinventing the same wheel.
 
-**What's here**: 8 MCP services, 9 custom agents, 6 rule files — all configured, tested, and mutually compatible. **Clone → Copy → Edit 2 paths → Work.**
+**What's here**: 8 MCP services, 9 custom agents, 6 rule files — all configured, tested, and mutually compatible. **Clone → init.sh → Work.**
 
 ### ③ No Undo When AI Messes Up
 
@@ -111,6 +111,21 @@ AI edits are probabilistic. Without backups, every change is a gamble.
 
 **The fix**: RTK (Rust Token Killer) intelligently strips shell output to what the AI actually needs. **Measured: 55% token savings**.
 
+### ⑤ "How Much Does the Model Still Remember?" — Real-Time Compression Counter
+
+**Problem**: During long sessions, Claude Code auto-compacts context. Each compaction turns early conversation into summaries — the model no longer has full context, relying instead on chains of summaries. The more compactions, the worse the "memory degradation." But users have no idea how many times it's happened.
+
+**Solution**: `statusline.py` shows **session compression count** instead of cost (you already know your API pricing). It tracks `total_input_tokens / 600K`.
+
+| Compressions | Status Line | Meaning |
+|-------------|------------|---------|
+| 0 | 🟢 Fresh memory | Full context, remembers everything |
+| 1-2 | 🟢 Compacted ×N | Early content summarized, normal range |
+| 3-4 | 🟡 Compacted ×N ⚠ | Multiple summary layers, details may be lost |
+| 5+ | 🔴 Compacted ×N 🔥 Start new session | Model relies entirely on summary chains, high hallucination risk |
+
+> 🎯 **Works with ALL models.** This tracks Claude Code's own context compaction behavior — it's independent of model pricing or provider. Whether your backend is DeepSeek, Anthropic, or OpenAI-compatible, the counter increases every time Claude Code auto-compacts. **All Claude Code CLI users can use this.**
+
 ---
 
 ## Core Differences: Generic Template vs. This Repo
@@ -126,8 +141,10 @@ AI edits are probabilistic. Without backups, every change is a gamble.
 | Custom Agents | Built-in defaults | **9** specialized (review/security/TDD/architecture/build/Rust…) |
 | Auto-Backup | ❌ None | **3 layers** (file + session + manual) |
 | Token Optimization | ❌ None | **RTK: 55% savings** |
+| Status Line | Shows cost only (known info) | **Real-time compression count** (memory degradation warning, model-agnostic) |
 | Scene Templates | Generic | **Frontend / Backend / Math-Algorithm** 3 presets |
-| Time to Productive | Days (trial and error) | **~15 minutes** |
+| Setup | Manual `cp` | **./init.sh interactive one-command setup** |
+| Time to Productive | Days (trial and error) | **~2 minutes** (init.sh) |
 
 ---
 
@@ -179,22 +196,36 @@ Claude Code connects to DeepSeek via DeepSeek's official `/anthropic` compatibil
 
 ## Quick Start
 
+### 🚀 One-Command Init (Recommended)
+
 ```bash
-# 1. Get a DeepSeek API Key → https://platform.deepseek.com
-# 2. Configure global settings.json (see "Prerequisite" above — MUST do first)
-# 3. Clone this repo
+# 1. Configure global settings.json (see "Prerequisite" above)
+# 2. Clone and run the init script
 git clone https://github.com/YuhaoLin2005/claude-code-starter.git
 cd claude-code-starter
+./init.sh
+```
 
-# 4. Copy config files
+The script auto-detects your DeepSeek config → interactively selects project type → copies all files → prints a completion checklist.
+
+### Manual Setup
+
+```bash
+git clone https://github.com/YuhaoLin2005/claude-code-starter.git
+cd claude-code-starter
 cp -r .claude/* ~/.claude/
 cp templates/mcp.json.example ~/.mcp.json
+# Edit ~/.mcp.json → update filesystem paths
+```
 
-# 5. Edit ~/.mcp.json — update filesystem paths (the only manual step)
-#    Find "C:\\Users\\xxx" → replace with your username
+### Staying Updated
 
-# 6. Launch
-claude
+```bash
+# Inside the repo directory
+./update.sh
+
+# Or remote one-liner
+curl -sL https://raw.githubusercontent.com/YuhaoLin2005/claude-code-starter/main/update.sh | bash
 ```
 
 > 📖 **Stuck?** See the [detailed setup guide (Chinese)](SETUP.md) with screenshots for every step.
@@ -214,9 +245,11 @@ claude
 | 📋 **Rule Files** (6) | Code Quality · Security · Testing · Workflow · Performance · Design Patterns |
 | 📂 **Scene Templates** (3) | Frontend · Backend · Math/Algorithm |
 | 🛡️ **Auto-Backup** (3 layers) | PreToolUse file snapshots · SessionStart git commit · Manual git reset |
-| ⚡ **Token Optimization** | RTK shell output stripping (measured 55%) · Cache hit rate fix (50%→90%+) · Sub-agent pro model |
+| ⚡ **Token Optimization** | RTK shell output stripping (measured 55%) · Cache hit rate fix (50%→90%+) · Sub-agent pro model · Status line compression counter (model-agnostic) |
+| 📊 **Status Line** | Real-time compression tracker — tells you how much the model remembers and when to start a fresh session |
 | 🔍 **Local OCR** | EasyOCR offline screenshot recognition — DeepSeek can't handle images, this bridges the gap |
 | 🔒 **Secret Scanning** | `/desensitize` command — scan for keys, paths, internal IPs before pushing (4 severity levels, allowlist support) |
+| 🚀 **One-Click Scripts** | `init.sh` interactive setup · `update.sh` one-click rule sync |
 | ⌨️ **Keybindings** | `Alt+T` toggle thinking mode · `Ctrl+O` view reasoning trace |
 
 ---
@@ -248,13 +281,16 @@ Answers to questions you might have:
 **Why `~/.claude/` instead of per-project `.claude/`?**
 → Rules, agents, and habits are user-level concerns. Cloning configs into every project is wasteful and leads to version fragmentation.
 
+**Why show compression count instead of cost in the status line?**
+→ Cost is known information — you know which API you're paying for. Compression count is the unknown: nobody can tell how many times Claude Code has silently compacted context. Each compaction turns early conversation into summaries, and the model degrades from "remembers everything" to "reasoning from summary chains." After 5+ compactions, hallucination risk spikes — but without the counter, you'd never know you're in the danger zone. **This feature works for ALL model backends**, not just DeepSeek.
+
 ---
 
 ## FAQ
 
 ### Q1: Will cloning this repo instantly connect Claude Code to DeepSeek?
 
-**No.** The API-level connection relies on DeepSeek's official `/anthropic` compatibility endpoint. You must manually configure `ANTHROPIC_BASE_URL` and your API Key in `~/.claude/settings.json` (see "Prerequisite" section above). This repo handles everything *after* the connection — MCP services, agents, rules, backups, token optimization.
+**No.** The API-level connection relies on DeepSeek's official `/anthropic` compatibility endpoint. You must manually configure `ANTHROPIC_BASE_URL` and your API Key in `~/.claude/settings.json` (see "Prerequisite" section above). This repo handles everything *after* the connection — MCP services, agents, rules, backups, token optimization. Running `./init.sh` helps detect missing config.
 
 ### Q2: Can I use these rules with Cursor / Roo Code / aider?
 
@@ -276,6 +312,14 @@ Answers to questions you might have:
 
 **No.** DeepSeek V4 Pro costs ~1/15 to 1/20 of Claude Sonnet 4 ($0.28/M input vs $3/M, $1.10/M output vs $15/M). With 90%+ cache hit rates and RTK saving 55% on shell tokens, actual daily cost is well under a dollar for typical usage. The tokens saved by using flash model aren't worth the bugs it introduces.
 
+### Q7: Is the compression count on the status line accurate?
+
+**Yes.** Compression count = `total_input_tokens / autoCompactWindow(600K)`, read directly from Claude Code's JSON stdin. No external API calls, no estimation — the number increments by 1 each time auto-compact fires. **All Claude Code CLI users**, regardless of model backend, can use this. Configure via the `statusLine` field in settings.json.
+
+### Q8: What can I do besides starting a new session when compression gets high?
+
+**You can manually trigger compact or reduce context usage** — try `/compact`, load fewer files at once, disable MCP services you don't need. But the most effective solution is starting a fresh session so the model regains full context.
+
 ---
 
 ## Lessons Learned
@@ -284,6 +328,7 @@ Things that cost me hours. May save you some:
 
 - **Sub-agent quality** — Default uses flash model for sub-tasks. Set `CLAUDE_CODE_SUBAGENT_MODEL=deepseek-v4-pro`.
 - **Cache hit rate (the WHY)** — `ATTRIBUTION_HEADER` carries session ID + timestamp. DeepSeek cache sees them as distinct requests. Set to `"0"` → 50%→90%+.
+- **Status line compression counter** — More useful than cost display: tells you how much the model still remembers. 5+ compactions = start a new session.
 - **Long context** — `autoCompactWindow=600K` + `CLAUDE_CODE_MAX_OUTPUT_TOKENS=32000` + `alwaysThinkingEnabled=true`.
 - **Windows MCP paths** — Double backslashes: `C:\\Users\\...`, or JSON parsing fails.
 - **RTK name collision** — crates.io has `reachingforthejack/rtk` (Rust Type Kit). You want the `rtk` package.
@@ -294,8 +339,9 @@ Things that cost me hours. May save you some:
 
 ## Roadmap
 
-- [ ] `init.sh` — one-click init script (auto-detect config + interactive scene selection)
-- [ ] `update.sh` — one-click sync latest rule templates
+- [x] `init.sh` — interactive one-command setup (auto-detect config + scene selection)
+- [x] `update.sh` — one-click sync latest rule templates
+- [x] `statusline.py` — compression counter status line (model-agnostic, all Claude Code CLI users)
 - [ ] More tech stack templates (Java/Spring, Go, Rust)
 - [ ] DeepSeek new model adaptation tracking
 
