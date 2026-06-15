@@ -34,26 +34,26 @@ ALWAYS use parallel execution for independent tasks. For complex problems, use s
 
 ## Proactive Skill Triggers (CRITICAL)
 
-User won't remember to invoke skills manually. You MUST proactively suggest the right skill when you detect these situations. Don't silently skip — ask with a one-liner suggestion.
+User won't remember to invoke skills manually. You MUST proactively suggest the right skill when you detect these situations. All suggestions MUST be in Chinese so the user understands what each skill does.
 
-| Situation | Skill to suggest | Prompt |
+| 你遇到的情况 | 应该建议的技能 | 用这句中文问用户 |
 |-----------|-----------------|--------|
-| User describes a new feature or domain concept | `/grill-with-docs` | "要不要先用 grill-with-docs 把领域知识记录下来？" |
-| User reports a bug or problem | `/triage` | "先用 triage 分类一下这个问题？" |
-| About to start coding a feature | `/tdd` | "用 TDD 流程来做？先写测试再实现。" |
-| Large PRD or spec needs breakdown | `/to-issues` | "这个 PRD 挺大的，拆成 issues 再逐个实现？" |
-| Problem is vague, need to clarify | `/diagnose` | "问题还不明确，用 diagnose 深入分析一下？" |
-| Multi-system or architectural change | `/zoom-out` | "涉及多个系统，先 zoom-out 看看整体架构？" |
-| Need a quick proof-of-concept | `/prototype` | "先 prototype 快速验证可行性？" |
-| Project missing domain context | Suggest creating `CONTEXT.md` | "这个项目还没有 CONTEXT.md，建一个方便后续？" |
-| Feature has implementation conflicts with existing ADRs | Flag ADR conflict explicitly | 按 domain.md 规则标注冲突 |
+| 用户描述新功能或新领域概念 | `/grill-with-docs`（领域文档生成器） | "要不要先用领域文档生成器把相关知识沉淀下来？后续AI就能自动理解这个项目了。" |
+| 用户报 bug 或描述问题 | `/triage`（问题分类器） | "先用问题分类器整理一下？会自动打标签、判断优先级。" |
+| 准备开始写代码实现功能 | `/tdd`（测试驱动开发向导） | "用TDD流程来做？先写测试再实现，保证代码质量。" |
+| 大的需求文档需要拆解 | `/to-issues`（需求拆解器） | "这个需求挺大的，拆成小任务逐个实现？更清晰也更好追踪。" |
+| 问题描述模糊、需要理清 | `/diagnose`（问题诊断器） | "问题还不明确，用诊断器深入分析一下根因？" |
+| 跨多个系统或架构级改动 | `/zoom-out`（架构视角切换） | "涉及多个系统，先切换到架构视角看看整体影响？" |
+| 需要快速验证一个想法 | `/prototype`（原型快速构建） | "先快速做个原型验证可行性？不用写完整代码。" |
+| 项目缺少领域知识文档 | 建议创建 `CONTEXT.md` | "这个项目还没有领域知识文档，建一个方便后续AI理解？" |
+| 新方案与现有架构决策冲突 | 按 domain.md 规则标注冲突 | 明确标注："与 ADR-XXXX 冲突——但值得重新讨论因为……" |
 
 ## Agent Skills — Domain Docs
 
 Before exploring unfamiliar projects:
 1. Check for `CONTEXT.md` at repo root — read it first
 2. Check `docs/adr/` for relevant architectural decisions
-3. If both missing and project is complex, suggest `/grill-with-docs`
+3. If both missing and project is complex, suggest `/grill-with-docs`（领域文档生成器）
 4. When naming concepts, use the glossary from CONTEXT.md — don't invent synonyms
 
 ## Git
