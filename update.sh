@@ -3,7 +3,7 @@
 # update.sh — 一键同步最新 DeepSeek 适配规则
 # ============================================================
 # 用法:
-#   curl -sL https://raw.githubusercontent.com/YuhaoLin2005/claude-code-starter/main/update.sh | bash
+#   curl -sL https://raw.githubusercontent.com/YuhaoLin2005/deepseek-claude-code-starter/main/update.sh | bash
 # ============================================================
 set -e
 
@@ -15,11 +15,11 @@ info() { echo -e "   ℹ️  $1${RESET}"; }
 echo -e "${BOLD}🔄 同步最新 DeepSeek 适配规则...${RESET}\n"
 
 CLAUDE_HOME="${HOME}/.claude"
-TMP_DIR="/tmp/claude-code-starter-update-$$"
+TMP_DIR="/tmp/deepseek-claude-code-starter-update-$$"
 
 # ── 拉取最新仓库 ────────────────────────────────────────────
 info "拉取最新规则模板..."
-git clone --depth 1 https://github.com/YuhaoLin2005/claude-code-starter.git "$TMP_DIR" 2>/dev/null || {
+git clone --depth 1 https://github.com/YuhaoLin2005/deepseek-claude-code-starter.git "$TMP_DIR" 2>/dev/null || {
     echo -e "   ${RED}❌ 拉取失败，请检查网络连接${RESET}"
     exit 1
 }
@@ -140,7 +140,7 @@ if [ -f "$TMP_DIR/.claude/scripts/statusline.py" ]; then
     if [ -f "$CLAUDE_HOME/scripts/statusline.py" ]; then
         if ! cmp -s "$TMP_DIR/.claude/scripts/statusline.py" "$CLAUDE_HOME/scripts/statusline.py"; then
             cp "$TMP_DIR/.claude/scripts/statusline.py" "$CLAUDE_HOME/scripts/statusline.py"
-            pass "更新: statusline.py (状态行定价校准)"
+            pass "更新: statusline.py (压缩计数器状态行)"
             UPDATED=$((UPDATED + 1))
         else
             skip "statusline.py 已是最新"
@@ -148,7 +148,7 @@ if [ -f "$TMP_DIR/.claude/scripts/statusline.py" ]; then
     else
         mkdir -p "$CLAUDE_HOME/scripts"
         cp "$TMP_DIR/.claude/scripts/statusline.py" "$CLAUDE_HOME/scripts/statusline.py"
-        pass "新增: statusline.py (状态行定价校准)"
+        pass "新增: statusline.py (压缩计数器状态行)"
         UPDATED=$((UPDATED + 1))
     fi
 fi
