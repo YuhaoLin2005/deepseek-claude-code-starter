@@ -1,212 +1,226 @@
-# 设置指南
+# 详细设置指南
 
-从零到完整配置，预计 10-15 分钟。
-
-## 前置条件
-
-- [ ] Claude Code 已安装（`claude --version`）
-- [ ] Node.js ≥ 18（`node --version`）
-- [ ] Git Bash 或 WSL（Windows 用户）
+一步一步从零配好 Claude Code + DeepSeek on Windows。
 
 ---
 
-## 第一步：获取 API Key
+## 准备工作
 
-### 必须
-1. 注册 [DeepSeek 平台](https://platform.deepseek.com)
-2. 进入 API Keys 页面，创建 Key
-3. 充值（最低 ¥10，够用很久）
-
-### 可选
-- **DashScope API Key**（图片分析功能）：[dashscope.aliyun.com](https://dashscope.aliyun.com)
-- **GitHub Personal Access Token**（GitHub MCP）：Settings → Developer settings → Tokens (classic)，勾选 `repo`、`read:org`、`workflow`
+| 你需要 | 怎么获取 |
+|--------|---------|
+| **DeepSeek API Key** | [platform.deepseek.com](https://platform.deepseek.com) 注册 → API Keys → 创建 |
+| **Node.js** (v18+) | [nodejs.org](https://nodejs.org) 下载 LTS 版安装 |
+| **Python 3.10+** | [python.org](https://python.org) 下载安装，**勾选 "Add to PATH"** |
+| **Git for Windows** | [git-scm.com](https://git-scm.com) 下载安装 |
+| **Claude Code CLI** | 见下方 Step 1 |
+| **RTK** (可选，推荐) | 见下方 Step 5 |
 
 ---
 
-## 第二步：设置环境变量
+## Step 1：安装 Claude Code
 
-### Windows（在 Git Bash 中执行）
-```bash
+```powershell
+npm install -g @anthropic-ai/claude-code
+```
+
+验证：
+```powershell
+claude --version
+```
+
+---
+
+## Step 2：设置 API Key
+
+```powershell
+# 方式 A：环境变量（推荐，重启终端后生效）
 setx ANTHROPIC_API_KEY "sk-your-deepseek-key"
-setx ANTHROPIC_BASE_URL "https://api.deepseek.com/anthropic"
-# 以下可选
-setx GITHUB_PERSONAL_ACCESS_TOKEN "ghp_xxx"
-setx DASHSCOPE_API_KEY "sk-xxx"
-setx PGPASSWORD "your-db-password"
-```
 
-### macOS / Linux
-```bash
-# 添加到 ~/.bashrc 或 ~/.zshrc
-export ANTHROPIC_API_KEY="sk-your-deepseek-key"
-export ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
-export GITHUB_PERSONAL_ACCESS_TOKEN="ghp_xxx"      # 可选
-export DASHSCOPE_API_KEY="sk-xxx"                   # 可选
-export PGPASSWORD="your-db-password"                # 可选
+# 方式 B：settings.local.json（优先级更高）
+# 复制 templates/settings.local.json.example → ~/.claude/settings.local.json
+# 建议用方式 A，避免文件泄露
 ```
-
-重启终端使环境变量生效。
 
 ---
 
-## 第三步：安装可选工具
+## Step 3：克隆配置仓库
 
-### RTK（Token 优化，推荐）
-```bash
-cargo install rtk
-# 或者
-cargo install --git https://github.com/reachingforthejack/rtk
-```
-
-### GitHub CLI
-```bash
-winget install GitHub.cli     # Windows
-brew install gh               # macOS
-sudo apt install gh           # Linux
-gh auth login
-```
-
-### uv（Vision MCP 需要）
-```bash
-pip install uv
-# 或
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-### PostgreSQL（数据库 MCP 需要）
-已安装的话确保 `psql` 可用。
-
----
-
-## 第四步：复制配置
-
-```bash
-# 克隆仓库
+```powershell
 git clone https://github.com/YuhaoLin2005/claude-code-starter.git
 cd claude-code-starter
-
-# 复制核心配置
-cp -r .claude/* ~/.claude/
-
-# 复制 MCP 配置模板
-cp templates/mcp.json.example ~/.mcp.json
-
-# 复制本地设置模板
-cp templates/settings.local.json.example ~/.claude/settings.local.json
 ```
 
 ---
 
-## 第五步：编辑本地配置
+## Step 4：复制配置文件
 
-### 1. `~/.mcp.json`
-修改 `filesystem` 的路径为你自己的项目目录：
+### 4.1 核心配置（~/.claude/）
+
+```powershell
+# 复制规则文件
+cp -r .claude/rules/ $env:USERPROFILE\.claude\rules\
+
+# 复制 Agent 定义
+cp -r .claude/agents/ $env:USERPROFILE\.claude\agents\
+
+# 复制命令
+cp -r .claude/commands/ $env:USERPROFILE\.claude\commands\
+
+# 复制 CLAUDE.md
+cp .claude\CLAUDE.md $env:USERPROFILE\.claude\CLAUDE.md
+cp .claude\RTK.md $env:USERPROFILE\.claude\RTK.md
+```
+
+### 4.2 MCP 服务器配置
+
+```powershell
+# 复制模板
+cp templates\mcp.json.example $env:USERPROFILE\.mcp.json
+```
+
+**重要：** 编辑 `~\.mcp.json`，把 filesystem 服务器里的路径改成你自己的：
+
 ```json
-"args": ["-y", "@modelcontextprotocol/server-filesystem", "/你的/项目路径", "/你的/桌面路径"]
+"filesystem": {
+  "command": "npx",
+  "args": [
+    "-y",
+    "@modelcontextprotocol/server-filesystem",
+    "C:\\Users\\你的用户名\\Desktop"
+  ]
+}
 ```
 
-如果不需要某个 MCP 服务，直接删除对应条目。MCP 说明：
+> ⚠️ Windows 路径必须写双反斜杠 `\\`，否则 JSON 解析失败。
 
-| MCP 服务 | 功能 | 是否必须 |
-|----------|------|---------|
-| filesystem | 文件读写 | ✅ 必须 |
-| playwright | 浏览器自动化 | 推荐 |
-| github | GitHub 操作 | 推荐 |
-| context7 | 文档搜索 | 推荐 |
-| duckduckgo | 网页搜索 | 可选 |
-| mcp-vision | 图片识别 | 可选（需 DashScope Key） |
-| postgres | 数据库查询 | 可选（需 PostgreSQL） |
-| parallel-search | LLM 优化搜索 | 可选（免 Key） |
-| squish | 持久化记忆 | 推荐 |
+### 4.3 DeepSeek 后端配置
 
-### 2. `~/.claude/settings.local.json`
+复制 `templates\settings.json.example` 到 `~\.claude\settings.json`（或与已有 settings.json 合并）。
 
-这是权限配置文件。**默认开启了 `bypassPermissions` 模式**——所有操作自动批准，不再弹确认框。
+核心 env 配置（使 Claude Code 走 DeepSeek API）：
 
-- 如果你不了解 Claude Code，建议先删除 `"defaultMode": "bypassPermissions"` 这一行，用一段时间默认模式再决定
-- 权限列表是推荐配置，你系统上没有的工具直接删掉对应行
-- 自己常用的工具路径也加进去
+```json
+{
+  "env": {
+    "ANTHROPIC_BASE_URL": "https://api.deepseek.com/anthropic",
+    "ANTHROPIC_MODEL": "deepseek-v4-pro",
+    "CLAUDE_CODE_SUBAGENT_MODEL": "deepseek-v4-pro",
+    "CLAUDE_CODE_MAX_OUTPUT_TOKENS": "32000",
+    "API_TIMEOUT_MS": "1200000",
+    "CLAUDE_CODE_ATTRIBUTION_HEADER": "0",
+    "CLAUDE_CODE_DISABLE_NONESSENTIAL_TRAFFIC": "1",
+    "autoCompactWindow": 600000
+  },
+  "alwaysThinkingEnabled": true
+}
+```
+
+> 💡 `CLAUDE_CODE_ATTRIBUTION_HEADER="0"` 是关键——关闭后 DeepSeek 缓存命中率从 50% 提升到 90%+。
 
 ---
 
-## 第六步：验证
+## Step 5：安装 RTK（可选，推荐）
 
-```bash
-# 启动 Claude Code
-claude
+RTK 自动精简 Shell 命令输出，实测节省 55% token。
 
-# 在 Claude Code 中验证：
-# 1. 输入 /status 查看模型配置
-# 2. 输入 /mcp 查看 MCP 服务状态
-# 3. 试试 "帮我搜一下今天的热点新闻" 测试搜索
-# 4. 试试 "审查当前代码" 测试 Agent
-```
+```powershell
+# 安装 Rust（如果没有）
+# https://rustup.rs → 下载 rustup-init.exe 运行
 
----
+# 安装 RTK
+cargo install rtk
 
-## Windows 用户额外步骤
-
-确保 Git Bash 已安装并配置为终端：
-```bash
-# Claude Code settings.json 中
-"preferredShell": "C:\\Program Files\\Git\\bin\\bash.exe"
-```
-
-RTK hook 路径在 Git Bash 中：
-```bash
-which rtk
-# 通常输出: /c/Users/你的用户名/.cargo/bin/rtk
-```
-
-### PyTorch GPU 支持（可选）
-
-如果你有 NVIDIA 显卡，想在 Claude Code 里跑 PyTorch：
-```bash
-# 安装独立 Python（不要用 QGIS 自带的，有 DLL 冲突）
-winget install Python.Python.3.12
-# 安装 CUDA 版 PyTorch
-/c/Users/你的用户名/AppData/Local/Programs/Python/Python312/python.exe -m pip install torch --index-url https://download.pytorch.org/whl/cu128
 # 验证
-/c/Users/你的用户名/AppData/Local/Programs/Python/Python312/python.exe -c "import torch; print(torch.cuda.is_available())"
+rtk --version
+rtk gain
 ```
+
+> ⚠️ crates.io 上有个重名包 `reachingforthejack/rtk` (Rust Type Kit)，别装错了。你需要的包名就是 `rtk`。
+
+---
+
+## Step 6：安装本地 OCR（可选）
+
+DeepSeek 不支持图片输入，EasyOCR 提供离线截图文字识别：
+
+```powershell
+pip install easyocr opencv-python
+```
+
+首次运行会自动下载模型（约 200MB，仅一次）。使用：
+
+```powershell
+python ~/.claude/scripts/ocr.py screenshot.png
+```
+
+---
+
+## Step 7：重启 Claude Code
+
+关掉所有终端窗口，重新打开，运行：
+
+```powershell
+claude
+```
+
+---
+
+## 验证一切正常
+
+进入 Claude Code 后：
+
+```
+# 检查 MCP 服务状态
+/mcp
+
+# 检查 Agent 列表
+ls ~/.claude/agents/
+
+# 检查规则文件
+ls ~/.claude/rules/
+
+# 跑一次 RTK 统计
+rtk gain
+```
+
+8 个 MCP 服务全部显示绿色 ✅ 即配置成功。
 
 ---
 
 ## 常见问题
 
-### Q: 启动后显示 "API key not found"
-```bash
-echo $ANTHROPIC_API_KEY  # 确认环境变量
-# Windows 用户注意：setx 只对新开的终端生效
-```
+### `claude` 命令找不到
 
-### Q: MCP 服务启动失败
-- 确认 Node.js >= 18
-- 确认对应包已安装：`npx -y @modelcontextprotocol/server-filesystem --help`
-- Windows 路径用双反斜杠 `C:\\Users\\...`
+npm 全局安装路径不在 PATH 中。用 `npm list -g --depth=0` 查看安装位置，手动加到 PATH。
 
-### Q: RTK hook 报错
-- RTK 是可选的，删除 `settings.json` 中的 `hooks` 部分即可禁用
+### MCP 服务启动失败
 
-### Q: 我想用 Anthropic API 不用 DeepSeek
-编辑 `~/.claude/settings.json`，把 `ANTHROPIC_BASE_URL` 和模型名改回默认值。
+1. 检查 Node.js 版本：`node --version`（需 >= 18）
+2. 检查 `.mcp.json` 语法：复制到 [jsonlint.com](https://jsonlint.com) 验证
+3. 检查 filesystem 路径是否存在且为双反斜杠
 
-### Q: bypassPermissions 安全吗？
-- 在你自己信任的项目目录里是安全的
-- Claude Code 只会操作你项目目录和 MCP 允许范围
-- 如果你担心，删掉 `"defaultMode": "bypassPermissions"` 即可回到默认模式
+### DeepSeek 返回错误
+
+1. API Key 是否正确：`echo $env:ANTHROPIC_API_KEY`
+2. 账户是否有余额：[platform.deepseek.com](https://platform.deepseek.com)
+3. `ANTHROPIC_BASE_URL` 是否正确
+
+### 缓存命中率为 0
+
+检查 `CLAUDE_CODE_ATTRIBUTION_HEADER` 是否设为 `"0"`。
+
+### RTK hook 报错
+
+RTK 是可选的。如果需要禁用，删除 `~/.claude/settings.json` 中 `hooks` 部分。
+
+### 我想用 Anthropic API 不用 DeepSeek
+
+编辑 `~/.claude/settings.json`，去掉 `ANTHROPIC_BASE_URL` 和模型相关 env 配置，恢复默认值。
 
 ---
 
-## 定制建议
+## 下一步
 
-| 需求 | 操作 |
-|------|------|
-| 只要代码审查 | 删除不需要的 Agent 文件 |
-| 不要 MCP | 清空 `.mcp.json` 中的 `mcpServers` |
-| 只要基础规则 | 删除 `rules/` 下不需要的文件 |
-| 换用其他模型 | 修改 `settings.json` 中的 `ANTHROPIC_MODEL` |
-| 不要自动批准 | 删除 `settings.local.json` 中 `defaultMode` 行 |
-| 添加自己的 Agent | 在 `agents/` 下新建 `.md` 文件 |
-
-搞不定？[提 Issue](https://github.com/YuhaoLin2005/claude-code-starter/issues)。
+- 阅读 [README.md](README.md) 了解完整功能
+- 看看 [踩坑笔记](README.md#踩坑笔记) 避开已知问题
+- 有问题提 [Issue](https://github.com/YuhaoLin2005/claude-code-starter/issues)
