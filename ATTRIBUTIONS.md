@@ -19,7 +19,6 @@
 
 | 插件 | 来源 | 说明 |
 |------|------|------|
-| **ECC (Everything Claude Code)** | @claude-plugins-official | hooks、token 优化、prompt 裁剪 |
 | frontend-design | @claude-plugins-official | 前端设计技能 |
 | feature-dev | @claude-plugins-official | 功能开发子代理 |
 | commit-commands | @claude-plugins-official | 提交命令 |
@@ -27,6 +26,13 @@
 | code-review | @claude-plugins-official | 代码审查 |
 | code-simplifier | @claude-plugins-official | 代码简化 |
 | hookify | @claude-plugins-official | Hook 规则生成 |
+| claude-md-management | @claude-plugins-official | CLAUDE.md 管理 |
+
+## Agent 技能
+
+| 项目 | 作者 | 仓库 | 说明 |
+|------|------|------|------|
+| **mattpocock/skills** | Matt Pocock | [github.com/mattpocock/skills](https://github.com/mattpocock/skills) | 工程化技能包（Issue 跟踪、Triage、TDD、PRD 等） |
 
 ## MCP 服务器
 
@@ -39,6 +45,9 @@
 | **Context7** | `@upstash/context7-mcp` | [upstash/context7](https://github.com/upstash/context7) |
 | **DuckDuckGo** | `duckduckgo-mcp-server` | NPM |
 | **Vision** | `mcp-vision` | [hahahahanb/mcp-vision](https://github.com/hahahahanb/mcp-vision) |
+| **Parallel Search** | Parallel AI Search | [search.parallel.ai](https://search.parallel.ai) |
+| **Sequential Thinking** | `@modelcontextprotocol/server-sequential-thinking` | [modelcontextprotocol/servers](https://github.com/modelcontextprotocol/servers) |
+| **Squish Memory** | `squish-memory` | NPM（本地 SQLite 持久化记忆） |
 
 ## Vision 后端
 

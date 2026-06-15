@@ -105,10 +105,28 @@ cp templates/settings.local.json.example ~/.claude/settings.local.json
 "args": ["-y", "@modelcontextprotocol/server-filesystem", "/你的/项目路径", "/你的/桌面路径"]
 ```
 
-如果不需要某个 MCP 服务，直接删除对应条目。
+如果不需要某个 MCP 服务，直接删除对应条目。MCP 说明：
+
+| MCP 服务 | 功能 | 是否必须 |
+|----------|------|---------|
+| filesystem | 文件读写 | ✅ 必须 |
+| playwright | 浏览器自动化 | 推荐 |
+| github | GitHub 操作 | 推荐 |
+| context7 | 文档搜索 | 推荐 |
+| duckduckgo | 网页搜索 | 可选 |
+| mcp-vision | 图片识别 | 可选（需 DashScope Key） |
+| postgres | 数据库查询 | 可选（需 PostgreSQL） |
+| parallel-search | LLM 优化搜索 | 可选（免 Key） |
+| sequential-thinking | 结构化思维链 | 可选 |
+| squish | 持久化记忆 | 推荐 |
 
 ### 2. `~/.claude/settings.local.json`
-这是权限配置文件。检查并按需调整。**不需要改也能用。**
+
+这是权限配置文件。**默认开启了 `bypassPermissions` 模式**——所有操作自动批准，不再弹确认框。
+
+- 如果你不了解 Claude Code，建议先删除 `"defaultMode": "bypassPermissions"` 这一行，用一段时间默认模式再决定
+- 权限列表是推荐配置，你系统上没有的工具直接删掉对应行
+- 自己常用的工具路径也加进去
 
 ---
 
@@ -141,6 +159,18 @@ which rtk
 # 通常输出: /c/Users/你的用户名/.cargo/bin/rtk
 ```
 
+### PyTorch GPU 支持（可选）
+
+如果你有 NVIDIA 显卡，想在 Claude Code 里跑 PyTorch：
+```bash
+# 安装独立 Python（不要用 QGIS 自带的，有 DLL 冲突）
+winget install Python.Python.3.12
+# 安装 CUDA 版 PyTorch
+/c/Users/你的用户名/AppData/Local/Programs/Python/Python312/python.exe -m pip install torch --index-url https://download.pytorch.org/whl/cu128
+# 验证
+/c/Users/你的用户名/AppData/Local/Programs/Python/Python312/python.exe -c "import torch; print(torch.cuda.is_available())"
+```
+
 ---
 
 ## 常见问题
@@ -162,6 +192,11 @@ echo $ANTHROPIC_API_KEY  # 确认环境变量
 ### Q: 我想用 Anthropic API 不用 DeepSeek
 编辑 `~/.claude/settings.json`，把 `ANTHROPIC_BASE_URL` 和模型名改回默认值。
 
+### Q: bypassPermissions 安全吗？
+- 在你自己信任的项目目录里是安全的
+- Claude Code 只会操作你项目目录和 MCP 允许范围
+- 如果你担心，删掉 `"defaultMode": "bypassPermissions"` 即可回到默认模式
+
 ---
 
 ## 定制建议
@@ -172,5 +207,7 @@ echo $ANTHROPIC_API_KEY  # 确认环境变量
 | 不要 MCP | 清空 `.mcp.json` 中的 `mcpServers` |
 | 只要基础规则 | 删除 `rules/` 下不需要的文件 |
 | 换用其他模型 | 修改 `settings.json` 中的 `ANTHROPIC_MODEL` |
+| 不要自动批准 | 删除 `settings.local.json` 中 `defaultMode` 行 |
+| 添加自己的 Agent | 在 `agents/` 下新建 `.md` 文件 |
 
 搞不定？[提 Issue](https://github.com/YuhaoLin2005/claude-code-starter/issues)。
