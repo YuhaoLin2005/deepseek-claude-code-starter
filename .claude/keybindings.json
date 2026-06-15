@@ -1,0 +1,34 @@
+{
+  "bindings": [
+    {
+      "keys": "ctrl+r",
+      "action": "slashCommand",
+      "slashCommand": "/code-review",
+      "description": "Code review current changes"
+    },
+    {
+      "keys": "ctrl+g",
+      "action": "slashCommand",
+      "slashCommand": "/commit-commands:commit",
+      "description": "Quick commit"
+    },
+    {
+      "keys": "ctrl+shift+p",
+      "action": "slashCommand",
+      "slashCommand": "/commit-commands:commit-push-pr",
+      "description": "Commit, push, and create PR"
+    },
+    {
+      "keys": "ctrl+l",
+      "action": "slashCommand",
+      "slashCommand": "/loop",
+      "description": "Run recurring command"
+    },
+    {
+      "keys": "ctrl+shift+v",
+      "action": "slashCommand",
+      "slashCommand": "/verify",
+      "description": "Verify changes work"
+    }
+  ]
+}

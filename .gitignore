@@ -1,0 +1,21 @@
+# 本地敏感配置 - 绝对不要提交
+settings.local.json
+.mcp.json
+
+# Claude Code 运行时
+.claude/sessions/
+.claude/cache/
+.claude/plugins/cache/
+.claude/plugins/known_marketplaces.json
+.claude/plugins/installed_plugins.json
+.claude/projects/
+
+# macOS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo

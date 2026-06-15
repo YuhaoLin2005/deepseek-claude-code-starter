@@ -1,0 +1,23 @@
+{
+  "ecc_mode": "on_by_default",
+  "auto_approve": [
+    "token_optimization",
+    "prompt_trimming",
+    "cheap_model_routing",
+    "skill_matching"
+  ],
+  "require_approval": [
+    "security_scan",
+    "memory_persistence_write",
+    "model_upgrade_to_opus",
+    "parallel_orchestration",
+    "file_deletion",
+    "external_network_access"
+  ],
+  "remind_user_when": [
+    "Very long conversation with repeated patterns — skill matching could help",
+    "About to run expensive batch operations — parallel orchestration could speed up",
+    "Disk below 10GB — cleanup needed",
+    "Multiple similar tasks detected — memory persistence could avoid re-explaining"
+  ]
+}
