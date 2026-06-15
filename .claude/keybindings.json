@@ -27,8 +27,8 @@
     {
       "keys": "ctrl+shift+v",
       "action": "slashCommand",
-      "slashCommand": "/verify",
-      "description": "Verify changes work"
+      "slashCommand": "/code-simplifier:simplify",
+      "description": "Simplify current code"
     }
   ]
 }

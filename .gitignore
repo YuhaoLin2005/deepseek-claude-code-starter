@@ -10,6 +10,10 @@ settings.local.json
 .claude/plugins/installed_plugins.json
 .claude/projects/
 
+# MCP 运行时产物
+squish_memory.db
+.claude/squish/
+
 # macOS
 .DS_Store
 Thumbs.db
