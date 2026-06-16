@@ -1,7 +1,16 @@
-# claude-code-deepseek-starter
+# deepseek-claude-code-starter
 
-整理了一些 Claude Code + DeepSeek 组合中常用的脚本和配置。  
-主要解决 DeepSeek 数据陈旧、无视觉能力、无自动备份等问题。
+Claude Code + DeepSeek 组合的脚本和配置集——让 DeepSeek 在 Claude Code 中发挥出接近原生的体验。
+
+## 核心优化
+
+- **🧠 模型分流**：主 Agent 用 Pro 做深度推理，子 Agent 用 Flash 处理读文件/搜索/测试等杂活。充分利用 DeepSeek 磁盘缓存（缓存命中 $0.014/M，成本直降 90%），子代理用 Flash 规避高缓存未命中率下的成本风险。
+- **📦 一键部署**：`./init.sh` 自动检测环境、交互式选择组件、符号链接到 `~/.claude/`。
+- **🔄 自动备份**：每次修改前备份文件（保留最近 5 份）+ 会话启动自动 git commit。
+- **🔍 搜索补强**：DuckDuckGo MCP 补足 DeepSeek 训练数据时效。
+- **👁️ 本地 OCR**：EasyOCR 离线识别截图，让 DeepSeek 能"看懂"图片。
+- **📊 状态行**：显示上下文压缩次数，压缩 5+ 次提醒新开会话。
+- **⚡ RTK 集成**：自动精简 Shell 命令输出，实测节省 55-80% token。
 
 ## 目录结构
 
