@@ -7,7 +7,7 @@ ALWAYS create new objects, NEVER mutate existing ones. Immutable data prevents h
 ## Core Principles
 
 - **KISS**: Simplest solution that works. Avoid premature optimization.
-- **DRY**: Extract repeated logic into shared functions. Introduce abstractions when repetition is real, not speculative.
+- **DRY**: Extract repeated logic into shared functions ONLY when repetition is real (≥3 occurrences), not speculative. See yagni.md ladder rung 1 before creating abstractions.
 - **YAGNI**: Don't build features or abstractions before they're needed. Start simple, refactor when pressure is real.
 
 ## File & Function Organization
