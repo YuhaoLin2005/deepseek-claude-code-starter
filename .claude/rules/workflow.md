@@ -1,18 +1,46 @@
 # Development Workflow
 
-## 🛡️ AUTO-BACKUP (Recommended Safety Net)
+## 🛡️ AUTO-BACKUP (MANDATORY — Before ANY file modification)
 
-> Before modifying files, ensure you can roll back. Git is the cheapest insurance.
+> 用户给了高权限，每次修改前必须确保可以回退。这是最后的安全网。
 
-**Before ANY Write/Edit operation:**
-1. Check if project is a git repo → `git status`
-2. If NOT → `git init && git add -A && git commit -m "chore: initial backup"`
-3. If dirty → `git add -A && git commit -m "chore: pre-task snapshot — <what you're about to do>"`
-4. After each significant change → commit with descriptive message
+### 自动备份（已通过 Hooks 实现）
 
-**Rollback:** `git reset --hard HEAD~1` reverts the last change.
+以下备份**自动执行**，无需 AI 手动触发：
+
+| 机制 | Hook | 效果 |
+|------|------|------|
+| **文件级备份** | `PreToolUse` (`Edit\|Write\|MultiEdit`) | 修改前自动 cp 到 `.claude/backups/`，每个文件保留最近 5 份 |
+| **会话快照** | `SessionStart` | 启动时自动 git commit 所有未提交变更 |
+| **家目录配置** | `SessionStart` | 自动同步 `.mcp.json`、`.gitconfig` 到 `.claude/home-config/` |
+
+### 手动备份（AI 兜底规则）
+
+Hook 可能因为首次启动未加载而漏掉，以下步骤仍需在**每次 Write/Edit 操作前**检查：
+
+1. Check if project is in a git repo → `git status`
+2. If NOT a git repo → `git init && git add -A && git commit -m "chore: initial backup"`
+3. If working tree is dirty → `git add -A && git commit -m "chore: pre-task snapshot — <what you're about to do>"`
+4. If clean → proceed with the task
+5. After each significant change → commit with descriptive message
+
+### 回退方法
+
+```bash
+# Git 回退
+git log --oneline -10          # 查看提交历史
+git reset --hard HEAD~1        # 回退到上一个快照
+
+# 文件级回退（Hook 自动备份）
+ls .claude/backups/<filename>.backup.*   # 列出备份版本
+cp .claude/backups/<filename>.backup.<ts> <original>  # 恢复
+```
+
+**Exception:** 用户明确排除的目录
 
 ## Feature Implementation Pipeline
+
+**-1. YAGNI Check** — 走一遍 yagni.md 的6级决策阶梯：这真的需要存在吗？标准库能解决吗？平台原生能力覆盖了吗？已安装依赖能用吗？能一行搞定吗？只有到达第6级才开始写代码。用户明确要求的功能跳过此步。
 
 **0. Research & Reuse** (mandatory before new implementation)
 - Search GitHub (`gh search code/repos`), npm/PyPI/crates.io for existing solutions
